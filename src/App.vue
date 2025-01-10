@@ -1,22 +1,23 @@
 <script setup>
 import { ref } from 'vue';
+import ChatDemo0 from './components/chat-00/ChatDemo0.vue';
 import ChatDemo1 from './components/chat-01/ChatDemo1.vue';
 import ChatDemo2 from './components/chat-02/ChatDemo2.vue';
 import { ButtonContextMenu } from '@mobilon-dev/chotto';
 
 const chats = [
-  /*{
-    index: null,
-    title: 'Chat00',
-    name: 'Chat00 - two chats demo',
-  },*/
   {
     index: 0,
+    title: 'Chat00',
+    name: 'Chat00 - two persons chat demo',
+  },
+  {
+    index: 1,
     title: 'Chat01',
     name: 'Chat01 - conversation 3 to 1 demo',
   },
   {
-    index: 1,
+    index: 2,
     title: 'Chat02',
     name: 'Chat02 - waba templates demo',
   }
@@ -26,7 +27,7 @@ const chats = [
 const currentChat = ref(chats[1].index)
 const currentName = ref(chats[1].name)
 const componentsMap = (index) => {
-  const r = [ChatDemo1, ChatDemo2]
+  const r = [ChatDemo0, ChatDemo1, ChatDemo2]
   return r[index];
 }
 
@@ -42,7 +43,7 @@ const handleClick = (action) => {
     <ButtonContextMenu 
       style="margin-left: 50px; z-index: 1001;"
       :actions="chats"
-      mode="click"
+      mode="hover"
       button-class="pi pi-list"
       menuSide="bottom"
       @click="handleClick"
