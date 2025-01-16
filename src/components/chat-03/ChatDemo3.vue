@@ -1,6 +1,7 @@
 <script setup>
  import { onMounted } from 'vue';
  import FloatBaseChatApp from './components/FloatBaseChatApp.vue';
+ import FloatFeedChatApp from './components/FloatFeedChatApp.vue';
 import {
   messages, chats,
   userProfiles
@@ -68,6 +69,13 @@ onMounted(() => {
 <template>
   <div class="container">
     <div class="cell11">
+      <FloatFeedChatApp
+        :auth-provider="authProvider"
+        :data-provider="dataProvider"
+        :index="0"
+      />
+    </div>
+    <div class="cell12">
       <FloatBaseChatApp
         :auth-provider="authProvider"
         :data-provider="dataProvider"
