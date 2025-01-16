@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import ChatDemo0 from './components/chat-00/ChatDemo0.vue';
 import ChatDemo1 from './components/chat-01/ChatDemo1.vue';
 import ChatDemo2 from './components/chat-02/ChatDemo2.vue';
+import ChatDemo3 from './components/chat-03/ChatDemo3.vue';
 import { ButtonContextMenu } from '@mobilon-dev/chotto';
 
 const chats = [
@@ -20,6 +21,11 @@ const chats = [
     index: 2,
     title: 'Chat02',
     name: 'Chat02 - waba templates demo',
+  },
+  {
+    index: 3,
+    title: 'Chat03',
+    name: 'Chat03 - messages search in chat',
   }
 ]
 
@@ -27,7 +33,7 @@ const chats = [
 const currentChat = ref(chats[1].index)
 const currentName = ref(chats[1].name)
 const componentsMap = (index) => {
-  const r = [ChatDemo0, ChatDemo1, ChatDemo2]
+  const r = [ChatDemo0, ChatDemo1, ChatDemo2, ChatDemo3]
   return r[index];
 }
 
