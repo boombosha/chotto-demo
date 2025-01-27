@@ -4,6 +4,7 @@ import ChatDemo0 from './components/chat-00/ChatDemo0.vue';
 import ChatDemo1 from './components/chat-01/ChatDemo1.vue';
 import ChatDemo2 from './components/chat-02/ChatDemo2.vue';
 import ChatDemo3 from './components/chat-03/ChatDemo3.vue';
+import ChatDemo4 from './components/chat-04/ChatDemo4.vue';
 import { ButtonContextMenu } from '@mobilon-dev/chotto';
 
 const chats = [
@@ -26,6 +27,11 @@ const chats = [
     index: 3,
     title: 'Chat03',
     name: 'Chat03 - messages search in chat',
+  },
+  {
+    index: 4,
+    title: 'Chat04',
+    name: 'Chat04 - adaptive to container size extended layout',
   }
 ]
 
@@ -33,7 +39,7 @@ const chats = [
 const currentChat = ref(chats[1].index)
 const currentName = ref(chats[1].name)
 const componentsMap = (index) => {
-  const r = [ChatDemo0, ChatDemo1, ChatDemo2, ChatDemo3]
+  const r = [ChatDemo0, ChatDemo1, ChatDemo2, ChatDemo3, ChatDemo4]
   return r[index];
 }
 

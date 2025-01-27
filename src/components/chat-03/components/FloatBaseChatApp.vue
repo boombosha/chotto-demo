@@ -70,7 +70,7 @@
               <Feed
                 :button-params="selectedChat.countUnread > 0 ? {unreadAmount: selectedChat.countUnread} : null"
                 :objects="messages"
-                :is-scroll-to-bottom-on-update-objects-enabled="isScrollToBottomOnUpdateObjectsEnabled"
+                :scroll-to-bottom="isScrollToBottomOnUpdateObjectsEnabled"
                 :typing="selectedChat.typing"
                 :scroll-to="clickedMessage"
                 @message-action="messageAction"

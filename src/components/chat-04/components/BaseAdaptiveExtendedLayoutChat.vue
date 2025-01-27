@@ -1,25 +1,17 @@
 <template>
   <div>
-    <button v-if="!userProfile.online" @mousedown="onlineUser">
-      Открыть чат
-    </button>
-    <FloatContainer
-      v-else
-      :title="userProfile ? userProfile.name : ''"
-      color-title="#d4d4d4"
-      :avatar="userProfile ? userProfile.avatar : ''"
-      height="850px"
-      width="900px"
-      @close-window="offlineUser"
+    <BaseContainer
+      ref="refContainer"
+      height="90vh"
     >
-      <BaseLayout>
-
+    <AdaptiveExtendedLayout
+        :is-second-col-visible="isSecondColVisible"
+        :is-third-col-visible="isThirdColVisible"
+      >
         <template #first-col>
-          <UserProfile :user="userProfile" />
-          <ChatList
-            :chats="chatsStore.chats"
-            filter-enabled
-            @select="selectChat"
+          <SideBar
+            v-if="sidebarFirstCol"
+            :sidebar-items="sidebarItems"
           />
           <ThemeMode
             :themes="themes"
@@ -28,15 +20,52 @@
         </template>
 
         <template #second-col>
+          <UserProfile :user="userProfile" />
+          <ChatList
+            v-if="!isOpenSearchPanel || (isOpenSearchPanel && feedSearchFeedCol)"
+            ref="refChatList"
+            :chats="chatsStore.chats"
+            filter-enabled
+            @select="selectChat"
+          >
+            <template #sidebar>
+              <SideBar
+                v-if="!sidebarFirstCol"
+                horizontal
+                :sidebar-items="sidebarItems"
+              />
+            </template>
+          </ChatList>
+          <FeedSearch 
+            v-if="isOpenSearchPanel && !feedSearchFeedCol"
+            @search="searchMessages"
+            @cancel="isOpenSearchPanel = !isOpenSearchPanel"
+          />
+          <FeedFoundObjects
+            v-if="isOpenSearchPanel && !feedSearchFeedCol"
+            :not-found="notFoundMessage"
+            :objects="foundMessages"
+            :foundAmount="foundMessages.length"
+            @clicked-search="handleClickMessage"
+          />
+        </template>
+
+        <template #third-col>
           <chat-wrapper
             :is-open-chat-panel="isOpenChatPanel"
             :is-selected-chat="!!selectedChat"
           >
             <template #default>
-              <ChatInfo
-                :chat="selectedChat"
-               >
-               <template #actions>
+              <div style="display: flex;
+                flex-direction: column;
+                height: 100%;"
+                :id="'feed-location'"
+              >
+                <ChatInfo 
+                  :chat="selectedChat"
+                  :show-return-button="isShowReturnButton"
+                  @return-to-chats="handleReturnToChats">
+                <template #actions>
                   <div style="display: flex;">
                     <button
                       class="chat-info__button-panel"
@@ -44,49 +73,69 @@
                     >
                       <span class="pi pi-info-circle" />
                     </button>
+                    <button
+                      class="chat-info__button-panel"
+                      @click="handleOpenSearchPanel"
+                    >
+                      <span class="pi pi-search" />
+                    </button>
+                    
                   </div>
                 </template>
-              </ChatInfo> 
-              
+              </ChatInfo>
+              <FeedSearch 
+                v-if="isOpenSearchPanel && feedSearchFeedCol"
+                @search="searchMessages"
+                @cancel="handleOpenSearchPanel"
+                @switch="isShowFeedWhileSearch = !isShowFeedWhileSearch"
+                is-feed-location
+              />
+              <FeedFoundObjects
+                v-if="isOpenSearchPanel && feedSearchFeedCol && !isShowFeedWhileSearch"
+                :not-found="notFoundMessage"
+                :objects="foundMessages"
+                :foundAmount="foundMessages.length"
+                @clicked-search="handleClickMessage"
+              />
               <Feed
+                v-if="isShowFeedWhileSearch || !feedSearchFeedCol"
                 :button-params="selectedChat.countUnread > 0 ? {unreadAmount: selectedChat.countUnread} : null"
                 :objects="messages"
-                :scroll-to-bottom="isScrollToBottomOnUpdateObjectsEnabled"
                 :typing="selectedChat.typing"
+                :scroll-to="clickedMessage"
+                :scroll-to-bottom="isScrollToBottomOnUpdateObjectsEnabled"
                 @message-action="messageAction"
-                @load-more="loadMore"
                 @message-visible="messageVisible"
-                />
-              <ChatInput
-                :state="stateButtons"
+              />
+              <ChatInput 
                 @send="addMessage"
-                @typing="sendTyping"
               >
                 <template #buttons>
                   <FileUploader
                     :filebump-url="filebumpUrl"
-                    :state="stateButtons"
+                    :state="'active'"
                   />
-                  <ButtonEmojiPicker 
+                  <ButtonEmojiPicker
                     :mode="'hover'"
-                    :state="stateButtons"
+                    :state="'active'"
                   />
                   <ButtonWabaTemplateSelector
                     :waba-templates="templates.wabaTemplates"
                     :group-templates="templates.groups"
                     :mode="'click'"
-                    :state="stateTemplate"
-                    @send-waba-values="sendWabaValues"
+                    :state="'active'"
                     :filebump-url="filebumpUrl"
+                    @send-waba-values="sendWabaValues"
                   />
-                  <ChannelSelector 
+                  <ChannelSelector
                     :channels="channels"
                     :mode="'hover'"
                     :state="'active'"
-                    @select-channel="selectChannel"
                   />
                 </template>
               </ChatInput>
+              </div>
+              
             </template>
 
             <template #chatpanel>
@@ -102,13 +151,13 @@
             </template>
           </chat-wrapper>
         </template>
-      </BaseLayout>
-    </FloatContainer>
+      </AdaptiveExtendedLayout>
+    </BaseContainer>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch, nextTick, computed } from "vue";
+import { onMounted, ref, watch, nextTick, computed, unref } from "vue";
 
 import {
   ChatInfo,
@@ -117,15 +166,18 @@ import {
   Feed,
   UserProfile,
   ChatPanel,
-  FloatContainer,
+  BaseContainer,
   ChatWrapper,
   formatTimestamp,
-  BaseLayout,
+  AdaptiveExtendedLayout,
   FileUploader,
   ButtonEmojiPicker,
   ChannelSelector,
   ThemeMode,
-  ButtonWabaTemplateSelector
+  ButtonWabaTemplateSelector,
+  FeedSearch,
+  FeedFoundObjects,
+  SideBar
 } from "@mobilon-dev/chotto";
 
 import { useChatsStore } from "../../../stores/chatsStore";
@@ -190,22 +242,29 @@ const isOpenChatPanel = ref(false);
 const isScrollToBottomOnUpdateObjectsEnabled = ref(false);
 const filebumpUrl = ref('https://filebump2.services.mobilon.ru');
 
-const stateTemplate = computed(() => {
-  if (selectedChannel.value){
-    if (selectedChannel.value.channelId == 'channelWABA')
-      return 'active'
-  }
-  return 'disabled'
-})
+const sidebarItems = ref([]);
+const clickedMessage = ref('')
+const notFoundMessage = ref(false)
+const foundMessages = ref([])
+const isOpenSearchPanel = ref(false)
+const feedSearchFeedCol = ref(false)
+const sidebarFirstCol = ref(true)
+const isShowFeedWhileSearch = ref(true)
+const isSecondColVisible = ref(false)
+const isThirdColVisible = ref(false)
+const isShowReturnButton = ref(false)
 
-const stateButtons = computed(() => {
-  if (selectedChannel.value){
-    if (messages.value.length > 2 || selectedChannel.value.channelId == 'channelSMS' ) {
-      return 'active'
-    } 
-  }
-  return 'disabled'
-})
+const refContainer = ref()
+
+const handleOpenSearchPanel = () => {
+  isOpenSearchPanel.value = !isOpenSearchPanel.value
+  isShowFeedWhileSearch.value = !isShowFeedWhileSearch.value
+}
+
+const handleReturnToChats = () => {
+  isSecondColVisible.value = true
+  isThirdColVisible.value = false
+}
 
 const sendWabaValues = (obj) => {
   console.log('send waba values', obj);
@@ -231,25 +290,6 @@ const sendWabaValues = (obj) => {
   addMessage(messageObject)
 }
 
-const selectChannel = (channel) => {
-  selectedChannel.value = channel
-}
-
-const offlineUser = () => {
-  userProfile.value.online = false
-  userProfile.value.status = 'gray'
-  props.authProvider.setUserProfileOnline(props.index, false);
-  chatsStore.setStatus(selectedChat.value.chatId, 'gray')
-}
-
-const onlineUser = () => {
-  userProfile.value.online = true
-  userProfile.value.status = 'lightgreen'
-  props.authProvider.setUserProfileOnline(props.index, true);
-  chatsStore.setStatus(selectedChat.value.chatId, 'lightgreen')
-}
-
-
 const messageAction = (data) => {
   console.log("message action", data);
 };
@@ -263,11 +303,6 @@ const messageVisible = (message) => {
     }
   }
 }
-
-const loadMore = () => {
-  // do load more messages to feed
-  console.log("load more");
-};
 
 const getFeedObjects = () => {
 
@@ -313,16 +348,10 @@ const addMessage = (message) => {
   chatsStore.increaseUnreadCounterOut(selectedChat.value.chatId, 1)
 };
 
-let timer;
-const sendTyping = () => {
-  chatsStore.setTypingIn(selectedChat.value.chatId, true)
-  clearTimeout(timer)
-  timer = setTimeout(() => {
-    chatsStore.setTypingIn(selectedChat.value.chatId, false)
-  },5000)
-}
 
 const selectChat = (chat) => {
+  isSecondColVisible.value = false
+  isThirdColVisible.value = true
   selectedChat.value = chat;
   if (selectedChat.value.countUnread > 0){
     chatsStore.setUnreadCounter(chat.chatId, 0);
@@ -331,10 +360,84 @@ const selectChat = (chat) => {
   messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
 };
 
+const searchMessages = (string) => {
+  if (string && string.length > 0){
+    foundMessages.value = transformToFeed(props.dataProvider.getMessagesBySearch(selectedChat.value.chatId, string))
+    foundMessages.value = foundMessages.value.reverse()
+    notFoundMessage.value = false
+    if (foundMessages.value.length == 0) 
+      notFoundMessage.value = true
+
+    if (foundMessages.value.length > 0){
+      let t = []
+      for (let m of foundMessages.value){
+        if (m.senderId != 4) m.subtext = selectedChat.value.name
+        if (m.senderId == 4) m.subtext = userProfile.value.name
+        if (m.type != 'system.date' && m.type != 'message.system') t.push(m)
+      }
+      foundMessages.value = t
+    }
+  }
+  else {
+    foundMessages.value = []
+  }
+}
+
+const handleClickMessage = (messageId) => {
+  const message = messages.value.find((m) => {
+    if (m.messageId == messageId) return m
+    })
+  if (!message) {
+    const messages1 = props.dataProvider.getFeedByMessage(selectedChat.value.chatId, messageId)
+    messages.value = transformToFeed(messages1)
+  }
+  setTimeout(() => {
+      highlightMessage(messageId)
+  }, 50)
+}
+
+let timer
+const highlightMessage = (messageId) => {
+  clearTimeout(timer)
+  const message = messages.value.find((m) => {
+      if (m.messageId == messageId) return m
+    })
+  if (message) {
+    clickedMessage.value = JSON.stringify(message)
+    timer = setTimeout(() => {
+      clickedMessage.value = ''
+    }, 100)
+  }
+}
+
+const resizeObserver = new ResizeObserver((entries) => {
+  const containerWidth = entries[0].target.clientWidth
+
+  if (containerWidth < 920){
+    feedSearchFeedCol.value = true
+    isShowReturnButton.value = true
+  }
+  if (containerWidth > 920){
+    feedSearchFeedCol.value = false
+    isShowReturnButton.value = false
+  }
+
+  if (containerWidth < 720){
+    sidebarFirstCol.value = false
+  }
+  if (containerWidth > 720){
+    sidebarFirstCol.value = true
+  }
+});
+
 onMounted(() => {
   userProfile.value = props.authProvider.getUserProfile(props.index);
   chatsStore.chats = props.dataProvider.getChats();
   channels.value = props.dataProvider.getChannels();
   templates.value = props.dataProvider.getTemplates()
+  sidebarItems.value = props.dataProvider.getSidebarItems();
+  if (unref(refContainer).$el){
+    resizeObserver.observe(unref(refContainer).$el)
+  }
 });
 </script>
