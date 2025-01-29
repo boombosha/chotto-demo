@@ -119,6 +119,12 @@
                     :mode="'hover'"
                     :state="'active'"
                   />
+                  <ButtonTemplateSelector
+                    :templates="templates.templates"
+                    :group-templates="templates.tgroups"
+                    :mode="'click'"
+                    :state="'active'"
+                  />
                   <ButtonWabaTemplateSelector
                     :waba-templates="templates.wabaTemplates"
                     :group-templates="templates.groups"
@@ -177,7 +183,8 @@ import {
   ButtonWabaTemplateSelector,
   FeedSearch,
   FeedFoundObjects,
-  SideBar
+  SideBar,
+  ButtonTemplateSelector
 } from "@mobilon-dev/chotto";
 
 import { useChatsStore } from "../../../stores/chatsStore";
