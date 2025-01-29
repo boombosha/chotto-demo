@@ -66,6 +66,16 @@ const dataProvider = {
   getMessages() {
     return data3.messages;
   },
+  getMessagesBySearch(chatId, string){
+    const messages = data3.messages.filter(m => m.chatId === chatId);
+    const search = messages.filter(m => {
+      if (m.text) {
+        const index = m.text.indexOf(string)
+        if (index != -1) return m
+      }
+    })
+    return search
+  },
   addMessage(message) {
     data3.messages.push(message);
     console.log("Добавлено новое сообщение:", message);

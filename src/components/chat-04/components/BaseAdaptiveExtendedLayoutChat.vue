@@ -98,7 +98,7 @@
                 @clicked-search="handleClickMessage"
               />
               <Feed
-                v-if="isShowFeedWhileSearch || !feedSearchFeedCol"
+                v-if="isShowFeedWhileSearch || !feedSearchFeedCol || !isOpenSearchPanel"
                 :button-params="selectedChat.countUnread > 0 ? {unreadAmount: selectedChat.countUnread} : null"
                 :objects="messages"
                 :typing="selectedChat.typing"
@@ -362,6 +362,7 @@ const selectChat = (chat) => {
 
 const searchMessages = (string) => {
   if (string && string.length > 0){
+    isShowFeedWhileSearch.value = false
     foundMessages.value = transformToFeed(props.dataProvider.getMessagesBySearch(selectedChat.value.chatId, string))
     foundMessages.value = foundMessages.value.reverse()
     notFoundMessage.value = false
@@ -384,6 +385,7 @@ const searchMessages = (string) => {
 }
 
 const handleClickMessage = (messageId) => {
+  isShowFeedWhileSearch.value = true
   const message = messages.value.find((m) => {
     if (m.messageId == messageId) return m
     })
