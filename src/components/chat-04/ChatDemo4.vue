@@ -9,7 +9,7 @@ import {
 import { useChatsStore } from '../../stores/chatsStore';
 
 const chatsStore = useChatsStore()
-const width = ref()
+const width = ref(1300)
 
 watch(() => width.value,
 ()=> {
