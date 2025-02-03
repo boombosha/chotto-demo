@@ -8,7 +8,7 @@
       :title="userProfile ? userProfile.name : ''"
       color-title="#d4d4d4"
       :avatar="userProfile ? userProfile.avatar : ''"
-      height="850px"
+      height="700px"
       width="900px"
       @close-window="offlineUser"
     >
@@ -20,6 +20,7 @@
             :chats="chatsStore.chats"
             filter-enabled
             @select="selectChat"
+            @action="chatAction"
           />
           <ThemeMode
             :themes="themes"
@@ -58,32 +59,19 @@
                 @message-visible="messageVisible"
                 />
               <ChatInput
-                :state="stateButtons"
                 @send="addMessage"
                 @typing="sendTyping"
               >
                 <template #buttons>
                   <FileUploader
                     :filebump-url="filebumpUrl"
-                    :state="stateButtons"
                   />
                   <ButtonEmojiPicker 
                     :mode="'hover'"
-                    :state="stateButtons"
                   />
-                  <ButtonWabaTemplateSelector
-                    :waba-templates="templates.wabaTemplates"
-                    :group-templates="templates.groups"
+                  <ButtonTemplateSelector
+                    :templates="templates.templates"
                     :mode="'click'"
-                    :state="stateTemplate"
-                    @send-waba-values="sendWabaValues"
-                    :filebump-url="filebumpUrl"
-                  />
-                  <ChannelSelector 
-                    :channels="channels"
-                    :mode="'hover'"
-                    :state="'active'"
-                    @select-channel="selectChannel"
                   />
                 </template>
               </ChatInput>
@@ -108,7 +96,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, nextTick, computed } from "vue";
+import { onMounted, ref, watch, nextTick } from "vue";
 
 import {
   ChatInfo,
@@ -120,12 +108,15 @@ import {
   FloatContainer,
   ChatWrapper,
   formatTimestamp,
+  insertDaySeparators,
+  playNotificationAudio,
+  sortByTimestamp,
   BaseLayout,
   FileUploader,
   ButtonEmojiPicker,
-  ChannelSelector,
+  ButtonTemplateSelector,
   ThemeMode,
-  ButtonWabaTemplateSelector
+  useModalCreateDialog,
 } from "@mobilon-dev/chotto";
 
 import { useChatsStore } from "../../../stores/chatsStore";
@@ -180,60 +171,15 @@ const themes = [
 const chatsStore = useChatsStore();
 
 // Reactive data
+const channels = ref([]);
 const selectedChat = ref(null);
-const selectedChannel = ref(null)
+const selectedDialog = ref(null)
 const messages = ref([]);
 const userProfile = ref({});
-const channels = ref([]);
 const templates = ref([]);
 const isOpenChatPanel = ref(false);
 const isScrollToBottomOnUpdateObjectsEnabled = ref(false);
 const filebumpUrl = ref('https://filebump2.services.mobilon.ru');
-
-const stateTemplate = computed(() => {
-  if (selectedChannel.value){
-    if (selectedChannel.value.channelId == 'channelWABA')
-      return 'active'
-  }
-  return 'disabled'
-})
-
-const stateButtons = computed(() => {
-  if (selectedChannel.value){
-    if (messages.value.length > 2 || selectedChannel.value.channelId == 'channelSMS' ) {
-      return 'active'
-    } 
-  }
-  return 'disabled'
-})
-
-const sendWabaValues = (obj) => {
-  console.log('send waba values', obj);
-  const messageObject = {
-      type: '',
-      text: '',
-      url: '',
-      filename: '',
-      size: '',
-    };
-
-    if (obj.file) {
-      messageObject.type = 'message.' + obj.file.filetype;
-      messageObject.url = obj.file.url;
-      messageObject.filename = obj.file.filename;
-      messageObject.size = obj.file.filesize.toString();
-      messageObject.text = obj.text.trim();
-    } else {
-      messageObject.type = 'message.text';
-      messageObject.text = obj.text.trim();
-    }
-
-  addMessage(messageObject)
-}
-
-const selectChannel = (channel) => {
-  selectedChannel.value = channel
-}
 
 const offlineUser = () => {
   userProfile.value.online = false
@@ -249,6 +195,15 @@ const onlineUser = () => {
   chatsStore.setStatus(selectedChat.value.chatId, 'lightgreen')
 }
 
+const chatAction = async (data) => {
+  console.log("chat action", data);
+  if (data.action === 'addDialog'){
+    const data1 = await useModalCreateDialog('Новый диалог', data.chat.name, data.chat.contact.attributes, channels.value)
+    console.log('info', data1);
+    props.dataProvider.addDialog(data1.contact.value, data1.channel.title, data.chat.chatId)
+  }
+};
+
 
 const messageAction = (data) => {
   console.log("message action", data);
@@ -259,6 +214,7 @@ const messageVisible = (message) => {
     if (message.senderId != props.index + 1 && message.status == 'received' && message.position == 'left'){
       chatsStore.readCurrentMessage(selectedChat.value.chatId, message)
       chatsStore.decreaseUnreadCounter(selectedChat.value.chatId, 1)
+      chatsStore.decreaseDialogUnreadCounter(selectedChat.value.chatId, selectedDialog.value.dialogId, 1)
       newMessage.value = !newMessage.value
     }
   }
@@ -271,10 +227,10 @@ const loadMore = () => {
 
 const getFeedObjects = () => {
 
-  if (selectedChat.value) {
+  if (selectedChat.value && selectedDialog.value) {
     // здесь обработка для передачи сообщений в feed
     isScrollToBottomOnUpdateObjectsEnabled.value = true;
-    const messages1 = props.dataProvider.getFeed(selectedChat.value.chatId);
+    const messages1 = props.dataProvider.getFeed(selectedChat.value.chatId, selectedDialog.value.dialogId);
     const messages3 = transformToFeed(messages1, props.index);
     if (JSON.stringify(messages.value) != JSON.stringify(messages3))
       nextTick(() => {
@@ -293,6 +249,7 @@ const addMessage = (message) => {
     text: message.text,
     type: message.type,
     chatId: selectedChat.value.chatId,
+    dialogId: selectedDialog.value.dialogId,
     senderId: props.index + 1,
     timestamp: Date.now() / 1000,
     status: 'received',
@@ -310,7 +267,7 @@ const addMessage = (message) => {
     Date.now()/ 1000,
     'received',
   )
-  chatsStore.increaseUnreadCounterOut(selectedChat.value.chatId, 1)
+  //chatsStore.increaseUnreadCounterOut(selectedChat.value.chatId, 1)
 };
 
 let timer;
@@ -324,17 +281,21 @@ const sendTyping = () => {
 
 const selectChat = (args) => {
   selectedChat.value = args.chat;
-  if (selectedChat.value.countUnread > 0){
-    chatsStore.setUnreadCounter(args.chat.chatId, 0);
-    chatsStore.readMessages(args.chat.chatId, props.index + 1)
+  selectedDialog.value = args.dialog;
+  if (selectedChat.value.countUnread > 0 || selectedDialog.value.countUnread > 0){
+    console.log('www')
+    chatsStore.decreaseUnreadCounter(args.chat.chatId, args.dialog.countUnread);
+    chatsStore.setDialogUnreadCounter(args.chat.chatId,args.dialog.dialogId, 0)
+    //chatsStore.readMessages(args.chat.chatId, props.index + 1)
   }
   messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
+  console.log(args.dialog)
 };
 
 onMounted(() => {
+  channels.value = props.dataProvider.getChannels();
   userProfile.value = props.authProvider.getUserProfile(props.index);
   chatsStore.chats = props.dataProvider.getChats();
-  channels.value = props.dataProvider.getChannels();
   templates.value = props.dataProvider.getTemplates()
 });
 </script>

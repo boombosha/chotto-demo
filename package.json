@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "vue": "^3.5.13",
-    "@mobilon-dev/chotto": "^0.0.89",
+    "@mobilon-dev/chotto": "^0.0.92",
     "pinia": "^2.2.8",
     "primeicons": "^7.0.0"
   },

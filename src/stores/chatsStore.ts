@@ -7,7 +7,11 @@ export const useChatsStore = defineStore('chats', () => {
   const chats: any = ref([])
   const messages: any = ref([])
   function getChatById(chatId: string) {
-    return chats.value.find((c: any) => c.chatId === chatId);
+    return chats.value.find((c: any) => c.chatId == chatId);
+  }
+
+  function getDialogById(chat: any, dialogId: string){
+    return chat.dialogs.find((d: any) => d.dialogId == dialogId)
   }
 
   function skipUnreadCounter(chatId: string) {
@@ -29,6 +33,40 @@ export const useChatsStore = defineStore('chats', () => {
 		const chat: any = chats.value.find((c:any) => c.chatId === chatId)
 		if (chat) chat.countUnread = countUnread
 	}
+
+  function setDialogUnreadCounter(chatId: string, dialogId: string, countUnread: number) {
+		const chat = getChatById(chatId);
+		if (chat) {
+      console.log(chat)
+      const dialog = getDialogById(chat, dialogId)
+      console.log(dialog, dialogId, chat.dialogs)
+      if (dialog){
+        dialog.countUnread = countUnread
+        console.log(dialog.countUnread)
+      }
+        
+    }
+	}
+
+  function increaseDialogUnreadCounter(chatId: string, dialogId: string, countUnread: number){
+    const chat = getChatById(chatId);
+    if (chat) {
+      chat.countUnreadOut += countUnread;
+      const dialog = getDialogById(chat, dialogId)
+      if (dialog)
+        dialog.countUnread += countUnread
+    }
+  }
+
+  function decreaseDialogUnreadCounter(chatId: string, dialogId: string, num: number) {
+    const chat = getChatById(chatId);
+    if (chat) {
+      chat.countUnreadOut -= num;
+      const dialog = getDialogById(chat, dialogId)
+      if (dialog)
+        dialog.countUnread -= num
+    }
+  }
 
   function setLastMessage(chatId: string, lastMessage: string) {
     const chat = getChatById(chatId);
@@ -149,5 +187,8 @@ export const useChatsStore = defineStore('chats', () => {
     increaseUnreadCounterOut,
     decreaseUnreadCounterOut,
     setUnreadCounterOut,
+    setDialogUnreadCounter,
+    increaseDialogUnreadCounter,
+    decreaseDialogUnreadCounter
   }
 })

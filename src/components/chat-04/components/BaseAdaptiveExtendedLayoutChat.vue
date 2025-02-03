@@ -360,13 +360,13 @@ const addMessage = (message) => {
 };
 
 
-const selectChat = (chat) => {
+const selectChat = (args) => {
   isSecondColVisible.value = false
   isThirdColVisible.value = true
-  selectedChat.value = chat;
+  selectedChat.value = args.chat;
   if (selectedChat.value.countUnread > 0){
-    chatsStore.setUnreadCounter(chat.chatId, 0);
-    chatsStore.readMessages(chat.chatId, props.index + 1)
+    chatsStore.setUnreadCounter(args.chat.chatId, 0);
+    chatsStore.readMessages(args.chat.chatId, props.index + 1)
   }
   messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
 };

@@ -342,11 +342,11 @@ const sendTyping = () => {
   },5000)
 }
 
-const selectChat = (chat) => {
-  selectedChat.value = chat;
+const selectChat = (args) => {
+  selectedChat.value = args.chat;
   if (selectedChat.value.countUnread > 0){
-    chatsStore.setUnreadCounter(chat.chatId, 0);
-    chatsStore.readMessages(chat.chatId, props.index + 1)
+    chatsStore.setUnreadCounter(args.chat.chatId, 0);
+    chatsStore.readMessages(args.chat.chatId, props.index + 1)
   }
   messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
 };
