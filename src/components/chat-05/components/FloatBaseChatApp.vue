@@ -73,6 +73,7 @@
                     :templates="templates.templates"
                     :mode="'click'"
                   />
+                  <AudioRecorder :filebump-url="filebumpUrl"/>
                 </template>
               </ChatInput>
             </template>
@@ -117,6 +118,7 @@ import {
   ButtonTemplateSelector,
   ThemeMode,
   useModalCreateDialog,
+  AudioRecorder,
 } from "@mobilon-dev/chotto";
 
 import { useChatsStore } from "../../../stores/chatsStore";
