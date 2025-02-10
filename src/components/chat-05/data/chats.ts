@@ -41,6 +41,14 @@ export const chats = [
         'lastActivity.timestamp': 1727001759111,   // для сортировки
         isSelected: false,
       },
+      {
+        dialogId: 'new',
+        name: 'Создать диалог',
+        fullname: 'Создать новый диалог с этим контактом',
+        countUnread: 0,
+        'lastActivity.timestamp': 1727000000000,   // для сортировки
+        isSelected: false,
+      },
     ],
     contact: {
       attributes: [

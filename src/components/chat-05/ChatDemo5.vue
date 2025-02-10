@@ -61,7 +61,7 @@ const dataProvider = {
     chat.dialogs.push({
       dialogId: 'dlg_8' + Date.now(),
       icon: '',
-      name: 'диалог' + (chat.dialogs.length + 1) + ' ' + contact,
+      name: 'диалог' + (chat.dialogs.length) + ' ' + contact,
       fullname: 'диалог ' + chat.dialogs.length + ' номер' + contact + ' канал ' + channel,
       countUnread: 0,
       'lastActivity.timestamp': 1727001759111,   // для сортировки
@@ -77,11 +77,11 @@ onMounted(() => {
 
 <template>
   <div class="container">
-      <FloatBaseChatApp
-        :auth-provider="authProvider"
-        :data-provider="dataProvider"
-        :index="3"
-      />
+    <FloatBaseChatApp
+      :auth-provider="authProvider"
+      :data-provider="dataProvider"
+      :index="3"
+    />
   </div>
 </template>
 
@@ -90,23 +90,6 @@ onMounted(() => {
   width: 1300px;
   height: 600px;
   margin: 30px auto;
-  display: grid;
-  grid-template-columns: 500px 1000px;
-  grid-template-rows: 500px 500px;
-}
-
-.cell11,.cell12,.cell21,.cell22{
   position: relative;
-}
-.cell12{
-  margin-left: 50px;
-}
-
-.cell21{
-  margin-top: 50px;
-}
-.cell22 {
-  margin-top: 50px;
-  margin-left: 50px;
 }
 </style>

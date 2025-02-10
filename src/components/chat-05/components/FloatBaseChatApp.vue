@@ -73,7 +73,7 @@
                     :templates="templates.templates"
                     :mode="'click'"
                   />
-                  <AudioRecorder :filebump-url="filebumpUrl"/>
+                  
                 </template>
               </ChatInput>
             </template>
@@ -281,17 +281,22 @@ const sendTyping = () => {
   },5000)
 }
 
-const selectChat = (args) => {
-  selectedChat.value = args.chat;
-  selectedDialog.value = args.dialog;
-  if (selectedChat.value.countUnread > 0 || selectedDialog.value.countUnread > 0){
-    console.log('www')
-    chatsStore.decreaseUnreadCounter(args.chat.chatId, args.dialog.countUnread);
-    chatsStore.setDialogUnreadCounter(args.chat.chatId,args.dialog.dialogId, 0)
-    //chatsStore.readMessages(args.chat.chatId, props.index + 1)
+const selectChat = async (args) => {
+  if (args.chat && args.dialog && args.dialog.dialogId == 'new'){
+    const data1 = await useModalCreateDialog('Новый диалог', args.chat.name, args.chat.contact.attributes, channels.value)
+    console.log('info', data1);
+    props.dataProvider.addDialog(data1.contact.value, data1.channel.title, args.chat.chatId)
   }
-  messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
-  console.log(args.dialog)
+  else {
+    selectedChat.value = args.chat;
+    selectedDialog.value = args.dialog;
+    if (selectedChat.value.countUnread > 0 || selectedDialog.value.countUnread > 0){
+      chatsStore.decreaseUnreadCounter(args.chat.chatId, args.dialog.countUnread);
+      chatsStore.setDialogUnreadCounter(args.chat.chatId,args.dialog.dialogId, 0)
+      //chatsStore.readMessages(args.chat.chatId, props.index + 1)
+    }
+    messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
+  }
 };
 
 onMounted(() => {
