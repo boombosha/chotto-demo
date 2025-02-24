@@ -9,10 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.13",
-    "@mobilon-dev/chotto": "^0.0.101",
+    "@microsoft/fetch-event-source": "^2.0.1",
+    "@mobilon-dev/chotto": "^0.0.104",
+    "axios": "^1.7.9",
     "pinia": "^2.2.8",
-    "primeicons": "^7.0.0"
+    "primeicons": "^7.0.0",
+    "uuid": "^11.1.0",
+    "vue": "^3.5.13"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
