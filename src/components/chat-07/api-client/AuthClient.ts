@@ -22,7 +22,6 @@ export class AuthClient{
     const rquid = v4()
 
     const scope = 'GIGACHAT_API_PERS'
-    console.log(this.axios)
     const response = await this.axios
       .post('',{scope: scope}, {headers: {
         authorization: authorization,

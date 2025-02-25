@@ -54,8 +54,8 @@ const chats = [
 ]
 
 
-const currentChat = ref(chats[5].index)
-const currentName = ref(chats[5].name)
+const currentChat = ref(chats[7].index)
+const currentName = ref(chats[7].name)
 const componentsMap = (index) => {
   const r = [ChatDemo0, ChatDemo1, ChatDemo2, ChatDemo3, ChatDemo4, ChatDemo5, ChatDemo6, ChatDemo7]
   return r[index];

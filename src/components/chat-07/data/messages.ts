@@ -12,6 +12,11 @@ export const messages = [
   },
 
   {
+    command: '/start', last: true,
+    type: "message.text", text: 'Для начала работы с моделью вам необходимо авторизоваться (команда /auth). После успешной авторизации вводите ваши сообщения как обычно.',
+  },
+
+  {
     command: '/auth', step: 1, last: false, mode: 'input', value: 'CLIENT_ID',
     type: "message.text", text: 'Введите CLIENT_ID',
   },
@@ -32,8 +37,8 @@ export const messages = [
   },
 
   {
-    command: '/auth', step: 4, mode: 'error', last: true,
-    type: "message.text", text: 'В процессе авторизации произошла ошибка, попробуйте ещё раз',
+    command: '/error', last: true,
+    type: "message.text", text: 'При запросе к серверу произошла ошибка',
   },
 
   {

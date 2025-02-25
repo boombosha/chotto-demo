@@ -61,6 +61,7 @@ import {
 } from "@mobilon-dev/chotto";
 
 import { useChatsStore } from "../../../stores/chatsStore";
+import { useAuthStore } from "../store/authStore";
 import { transformToFeed } from "../../../transform/transformToFeed";
 import { useNewMessage } from "../useNewMessage";
 import { ApiClient } from "../api-client/ApiClient";
@@ -115,6 +116,7 @@ const themes = [
   },
 ];
 const chatsStore = useChatsStore();
+const authStore = useAuthStore()
 
 // Reactive data
 const apiClient = ref(null)
@@ -128,6 +130,8 @@ const isOpenChatPanel = ref(false);
 const command = ref()
 const step = ref()
 const variableName = ref('')
+const prompt = ref([])
+const currentIncomingMessage = ref([])
 
 const commands = computed(() => {
   if (selectedChat.value && selectedChat.value.commands) return selectedChat.value.commands
@@ -178,7 +182,14 @@ const loadMore = () => {
 const getFeedObjects = (scrollFlag) => {
   if (selectedChat.value) {
     // здесь обработка для передачи сообщений в feed
-    isScrollToBottomOnUpdateObjectsEnabled.value = scrollFlag
+    if (scrollFlag){
+      isScrollToBottomOnUpdateObjectsEnabled.value = false
+      setTimeout(() => {
+        isScrollToBottomOnUpdateObjectsEnabled.value = true
+      }, 20)
+    }
+      
+
     const messages = props.dataProvider.getFeed(selectedChat.value.chatId);
     const messages3 = transformToFeed(messages, props.index);
     const messages2 = messages3.map((m) => {
@@ -194,7 +205,7 @@ const getFeedObjects = (scrollFlag) => {
 
 };
 
-const addMessage = (message) => {
+const addMessage = async (message) => {
   console.log(message, selectedChat.value.chatId);
   // Добавление сообщения в хранилище
   if (message.text.startsWith('/')){
@@ -207,7 +218,7 @@ const addMessage = (message) => {
       chatId: selectedChat.value.chatId,
       senderId: props.index + 1,
       timestamp: Date.now()/ 1000,
-      status: 'received',
+      status: 'read',
       url: message.url,
       filename: message.filename,
       direction: 'outgoing',
@@ -223,72 +234,114 @@ const addMessage = (message) => {
     )
     if (variableName.value != ''){
       localStorage.setItem(variableName.value, message.text)
+      variableName.value = ''
     }
     if (step.value) {
       step.value += 1
       addCommandMessage({text: command.value})
     }
-    
+    messages.value = getFeedObjects(true); // Обновление сообщений
+    newMessage.value = !newMessage.value
+
+    if (apiClient.value && authStore.isAuthenticated){
+      addResponseMessage(message)
+    }
   }
   messages.value = getFeedObjects(true); // Обновление сообщений
   newMessage.value = !newMessage.value
 };
 
-const addCommandMessage = async (message, filter = null) => {
-  console.log('com')
-    if (command.value != message.text){
-      step.value = undefined
-      command.value = message.text
-    }
-    
-    const msgTemplate = props.dataProvider.getCommandMessage(message.text, step.value, filter)
-    if (message.text != '/tokens'){
-      props.dataProvider.addMessage({
-        text: msgTemplate.text,
-        type: msgTemplate.type,
-        timestamp: Date.now()/ 1000,
-        chatId: selectedChat.value.chatId,
-        status: 'read',
-      })
-    }
+const addResponseMessage = async (reqMessage) => {
+  prompt.value.push({
+    role: 'user',
+    content: reqMessage.text,
+    attachments: [],
+  })
+ chatsStore.setTypingIn(selectedChat.value.chatId, true)
       
-
-    if (msgTemplate.step && !msgTemplate.last) 
-      step.value = msgTemplate.step
-    else
-      step.value = undefined
-
-    if (msgTemplate.mode == 'input'){
-      variableName.value = msgTemplate.value
+  const response = await apiClient.value.sendStreamRequest('GigaChat',prompt.value,true,0.2)
+  currentIncomingMessage.value = response
+  let t = ''
+  props.dataProvider.addMessage({
+    text: t,
+    type: 'message.text',
+    chatId: selectedChat.value.chatId,
+    direction: 'incoming',
+    timestamp: Date.now()/ 1000,
+  })
+  const inter = setInterval(() => {
+    if (response.length == 0){
+      chatsStore.setTypingIn(selectedChat.value.chatId, false)
+      clearInterval(inter)
     }
-
-    if (msgTemplate.mode == 'request'){
-      const response = await networkAccess(message.text)
-      console.log(response)
-      step.value += 1
-      if (!response){
-        if (!msgTemplate.last)
-        addCommandMessage({text: command.value}, 'error')
-      }
-      else {
-        if (command.value == '/auth') addCommandMessage({text: command.value}, 'success')
-        if (command.value == '/tokens') {
-          props.dataProvider.addMessage({
-            text: msgTemplate.text + response,
-            type: msgTemplate.type,
-            timestamp: Date.now()/ 1000,
-            chatId: selectedChat.value.chatId,
-            status: 'read',
-          })
-        }
-      }
+    else {
+      t += response.shift()
+      props.dataProvider.editMessage(t)
       messages.value = getFeedObjects(true); // Обновление сообщений
       newMessage.value = !newMessage.value
+      if (response.length == 0)
+        prompt.value.push({
+          role:'assistant',
+          content: t,
+          attachments: [],
+        })
     }
+  }, 500)
+  
+}
+
+const addCommandMessage = async (message, filter = null) => {
+  if (command.value != message.text){
+    step.value = undefined
+    command.value = message.text
+  }
+  const msgTemplate = props.dataProvider.getCommandMessage(message.text, step.value, filter)
+  if (message.text != '/tokens'){
+    props.dataProvider.addMessage({
+      text: msgTemplate.text,
+      type: msgTemplate.type,
+      timestamp: Date.now()/ 1000,
+      chatId: selectedChat.value.chatId,
+      status: 'read',
+    })
+  }
+
+  if (msgTemplate.step && !msgTemplate.last) 
+    step.value = msgTemplate.step
+  else
+    step.value = undefined
+
+  if (msgTemplate.mode == 'input'){
+    variableName.value = msgTemplate.value
+  }
+
+  if (msgTemplate.mode == 'request'){
+    const response = await networkAccess(message.text)
+    console.log(response)
+    step.value += 1
+    if (!response){
+      addCommandMessage({text: '/error'})
+      command.value = undefined
+      step.value = undefined
+    }
+    else {
+      if (command.value == '/auth') addCommandMessage({text: command.value}, 'success')
+      if (command.value == '/tokens') {
+        props.dataProvider.addMessage({
+          text: msgTemplate.text + response,
+          type: msgTemplate.type,
+          timestamp: Date.now()/ 1000,
+          chatId: selectedChat.value.chatId,
+          status: 'read',
+        })
+      }
+    }
+    messages.value = getFeedObjects(true); // Обновление сообщений
+    newMessage.value = !newMessage.value
+  }
 }
 
 const networkAccess = async (postfix) => {
-  console.log(postfix)
   switch(postfix){
     case '/auth': 
       let interval;
@@ -297,20 +350,28 @@ const networkAccess = async (postfix) => {
       if (response) {
         interval = setInterval(async () => {
           const response = await authenticate()
-          if (!response) clearInterval(interval)
+          if (!response){
+            clearInterval(interval)
+          }
         }, 30  * 60 * 1000)
       }
       return response
     case '/tokens': 
-      return await apiClient.value.getAvailableTokens()
+      if (apiClient.value && authStore.isAuthenticated)
+        return await apiClient.value.getAvailableTokens()
+      else return false
   }
 }
 
 const authenticate = async () => {
   const response = await authClient.getToken(localStorage.getItem('CLIENT_ID'), localStorage.getItem('CLIENT_SECRET'))
   if (response) {
-    localStorage.setItem('token', response.access_token)
+    authStore.setToken(response.access_token)
     apiClient.value = new ApiClient(response.access_token)
+  }
+  else {
+    authStore.resetToken()
+    apiClient.value = null
   }
   return response
 }
@@ -321,6 +382,5 @@ onMounted(() => {
   selectedChat.value = chatsStore.chats[props.index]
   messages.value = getFeedObjects(false)
   themes[props.index].default = true
-  
 });
 </script>

@@ -58,6 +58,9 @@ const dataProvider = {
     data3.messages.push(message);
     console.log("Добавлено новое сообщение:", message);
   },
+  editMessage(text){
+    data3.messages[data3.messages.length - 1].text = text
+  }
 };
 
 onMounted(() => {
