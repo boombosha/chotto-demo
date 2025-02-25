@@ -1,21 +1,11 @@
 export const userProfiles = [
   {
     id: 1,
-    name: "Юрий",
+    name: "GigaChat",
     email: "user@m.com",
     phone: "+79XXXXXXXX",
     auth: 'secretkey1',
-    avatar: 'https://placehold.jp/30/336633/ffffff/64x64.png?text=MV',
-    status: "lightgreen",
-    online: true,
-  },
-  {
-    id: 4,
-    name: "Юрий",
-    email: "user@m.com",
-    phone: "+79XXXXXXXX",
-    auth: 'secretkey1',
-    avatar: 'https://placehold.jp/30/336633/ffffff/64x64.png?text=MV',
+    avatar: 'https://cdn-app.giga.chat/misc/0.0.0/assets/common/a4005005_e685691c_Group.svg',
     status: "lightgreen",
     online: true,
   },
