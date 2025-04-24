@@ -29,10 +29,11 @@
               v-if="actions"
               :actions="actions"
               mode="hover"
-              button-class="pi pi-plus"
               menuSide="right"
-              @click="handleClick"
-            />
+            >
+              <span class="pi pi-plus bcm-chat-action"></span>
+            </ButtonContextMenu>
+
           </div>
           
           <ChatList
@@ -493,5 +494,9 @@ onMounted(() => {
     font-size: 20px;
     margin: auto 0;
   }
+}
+
+.bcm-chat-action{
+  line-height: 27px;
 }
 </style>

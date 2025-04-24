@@ -14,12 +14,14 @@
       <template #controls>
         <ButtonContextMenu
           :actions="actions"
-          :button-class="'pi pi-list'"
           :mode="'click'"
           :menu-side="'bottom'"
           :context-menu-key="'top-actions'"
           @click="headerButtonClick"
-        />
+        >
+          <span class="pi pi-list header-bcm"></span>
+        </ButtonContextMenu>
+
       </template>
       <FeedLayout>
         <template #default>
@@ -312,3 +314,10 @@ onMounted(() => {
   themes[props.index].default = true
 });
 </script>
+
+<style>
+.header-bcm{
+  padding: 14px;
+  cursor: pointer;
+}
+</style>
