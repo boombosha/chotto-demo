@@ -105,12 +105,8 @@ const themes = [
     
   },
   {
-    code: "green",
-    name: "Green",
-  },
-  {
-    code: "diamond",
-    name: "Diamond",
+    code: "custom",
+    name: "custom",
   },
 ];
 const chatsStore = useChatsStore();
@@ -210,6 +206,6 @@ onMounted(() => {
   chatsStore.chats = props.dataProvider.getChats();
   selectedChat.value = chatsStore.chats[props.index]
   messages.value = getFeedObjects(false)
-  themes[props.index].default = true
+  themes[1].default = true
 });
 </script>

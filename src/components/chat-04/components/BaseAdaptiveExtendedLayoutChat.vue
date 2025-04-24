@@ -21,11 +21,26 @@
 
         <template #second-col>
           <UserProfile :user="userProfile" />
+          <div class="chat-list-title-container">
+            <h2>
+              Чаты
+            </h2>
+            <ButtonContextMenu 
+              v-if="actions"
+              :actions="actions"
+              mode="hover"
+              button-class="pi pi-plus"
+              menuSide="right"
+              @click="handleClick"
+            />
+          </div>
+          
           <ChatList
             v-if="!isOpenSearchPanel || (isOpenSearchPanel && feedSearchFeedCol)"
             ref="refChatList"
             :chats="chatsStore.chats"
             filter-enabled
+            :title-enabled="false"
             @select="selectChat"
           >
             <template #sidebar>
@@ -186,7 +201,8 @@ import {
   FeedSearch,
   FeedFoundObjects,
   SideBar,
-  ButtonTemplateSelector
+  ButtonTemplateSelector,
+  ButtonContextMenu
 } from "@mobilon-dev/chotto";
 
 import { useChatsStore } from "../../../stores/chatsStore";
@@ -229,14 +245,19 @@ const themes = [
     
   },
   {
-    code: "green",
-    name: "Green",
-  },
-  {
-    code: "diamond",
-    name: "Diamond",
+    code: "custom",
+    name: "Custom",
   },
 ];
+
+const actions = [
+  {
+    title: 'Создать чат'
+  },
+  {
+    title: 'Пригласить'
+  }
+]
 
 const chatsStore = useChatsStore();
 
@@ -461,3 +482,16 @@ onMounted(() => {
   }
 });
 </script>
+
+<style>
+.chat-list-title-container{
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px 0 10px;
+
+  h2{
+    font-size: 20px;
+    margin: auto 0;
+  }
+}
+</style>

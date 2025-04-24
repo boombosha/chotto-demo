@@ -69,15 +69,21 @@ const handleClick = (action) => {
 </script>
 
 <template>
-  <div class="toolbar">
+  <div class="toolbar" data-theme="light">
     <ButtonContextMenu 
-      style="margin-left: 50px; z-index: 1001;"
+      style="margin-left: 50px; z-index: 1001; padding: 14px;"
       :actions="chats"
       mode="hover"
       button-class="pi pi-list"
       menuSide="bottom"
       @click="handleClick"
-    />
+    >
+      <span class="pi pi-list"></span>
+    </ButtonContextMenu>
+    <Teleport to="body">
+      <div class="context-menu" data-theme="light" id="float-windows-undefined"></div>
+    </Teleport>
+    
     <h2 class="toolbar-title">
       {{ currentName }}
     </h2>
@@ -95,6 +101,10 @@ const handleClick = (action) => {
     margin-bottom: 15px;
     background-color: lightgray;
     border-radius: 5px;
+  }
+
+  .context-menu{
+    font-family: "Montserrat", sans-serif;
   }
 
   .toolbar-title{

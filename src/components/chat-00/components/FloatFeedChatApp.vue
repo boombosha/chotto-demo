@@ -125,17 +125,13 @@ const themes = [
   {
     code: "dark",
     name: "Dark",
-
   },
   {
-    code: "green",
-    name: "Green",
-  },
-  {
-    code: "diamond",
-    name: "Diamond",
+    code: "custom",
+    name: "custom",
   },
 ];
+
 const chatsStore = useChatsStore();
 
 // Reactive data
