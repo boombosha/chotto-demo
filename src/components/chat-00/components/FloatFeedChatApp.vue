@@ -127,6 +127,10 @@ const themes = [
     name: "Dark",
   },
   {
+    code: "green",
+    name: "Green",
+  },
+  {
     code: "custom",
     name: "custom",
   },

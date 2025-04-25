@@ -110,7 +110,10 @@ const themes = [
   {
     code: "dark",
     name: "Dark",
-    
+  },
+  {
+    code: "green",
+    name: "Green",
   },
   {
     code: "custom",
