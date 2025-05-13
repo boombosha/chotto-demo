@@ -25,6 +25,7 @@
           <ThemeMode
             :themes="themes"
             :show="true"
+            @selected-theme="setTheme"
           />
         </template>
 
@@ -181,6 +182,11 @@ const isOpenChatPanel = ref(false);
 const isScrollToBottomOnUpdateObjectsEnabled = ref(false);
 const filebumpUrl = ref('https://filebump2.services.mobilon.ru');
 
+const theme = ref('')
+const setTheme = (themeCode) => {
+  theme.value = themeCode
+}
+
 const offlineUser = () => {
   userProfile.value.online = false
   userProfile.value.status = 'gray'
@@ -198,7 +204,7 @@ const onlineUser = () => {
 const chatAction = async (data) => {
   console.log("chat action", data);
   if (data.action === 'addDialog'){
-    const data1 = await useModalCreateDialog('Новый диалог', data.chat.name, data.chat.contact.attributes, channels.value)
+    const data1 = await useModalCreateDialog('Новый диалог', data.chat.name, data.chat.contact.attributes, channels.value, null, theme.value)
     console.log('info', data1);
     props.dataProvider.addDialog(data1.contact.value, data1.channel.title, data.chat.chatId)
   }
@@ -281,7 +287,7 @@ const sendTyping = () => {
 
 const selectChat = async (args) => {
   if (args.chat && args.dialog && args.dialog.dialogId == 'new'){
-    const data1 = await useModalCreateDialog('Новый диалог', args.chat.name, args.chat.contact.attributes, channels.value)
+    const data1 = await useModalCreateDialog('Новый диалог', args.chat.name, args.chat.contact.attributes, channels.value, null, theme.value)
     console.log('info', data1);
     props.dataProvider.addDialog(data1.contact.value, data1.channel.title, args.chat.chatId)
   }
