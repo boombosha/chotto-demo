@@ -128,7 +128,7 @@
               <ChatInput 
                 @send="addMessage"
               >
-                <template #buttons>
+                <template #inline-buttons>
                   <FileUploader
                     :filebump-url="filebumpUrl"
                     :state="'active'"
@@ -137,6 +137,8 @@
                     :mode="'hover'"
                     :state="'active'"
                   />
+                </template>
+                <template #buttons>
                   <ButtonTemplateSelector
                     :templates="templates.templates"
                     :group-templates="templates.tgroups"

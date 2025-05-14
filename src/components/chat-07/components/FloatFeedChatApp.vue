@@ -34,10 +34,13 @@
               <ChatInput
                 @send="addMessage"
                 @typing="sendTyping"
-                :commands="commands"
               >
-                <template #buttons>
-
+                <template #inline-buttons>
+                  <ButtonCommandsSelector
+                    :mode="'hover'"
+                    :commands="commands"
+                    @send="addMessage"
+                  />
                 </template>
               </ChatInput>
             </template>
@@ -58,6 +61,7 @@ import {
   ChatWrapper,
   formatTimestamp,
   ThemeMode,
+  ButtonCommandsSelector,
 } from "@mobilon-dev/chotto";
 
 import { useChatsStore } from "../../../stores/chatsStore";

@@ -18,7 +18,7 @@
   --chotto-chat-input-container-bg: #ccfad35b;
   --chotto-chat-input-icon-color: #6be0e0;
   --chotto-chat-input-icon-color-disabled: #2c9494;
-
+  --chotto-chat-input-button-padding: 5px;
   /* Chat Item */
   --chotto-chat-item-padding-container: 10px 20px 10px 15px;
   --chotto-chat-item-border-radius: 0;
