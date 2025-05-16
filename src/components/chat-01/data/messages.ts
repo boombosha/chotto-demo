@@ -27,23 +27,29 @@ export const messages = [
         },
       ],
     },
+    header: 'Юрий',
   },
   {
     senderId:1, chatId: 1, type: "message.text", text: "Созвонимся сегодня?", status: 'read', timestamp: '1727027859',
     actions: [
       { action: 'edit', title: 'изменить', icon: 'https://placehold.jp/30/336633/ffffff/64x64.png?text=pin' },
-      { action: 'delete', title: 'удалить' }]
+      { action: 'delete', title: 'удалить' }
+    ],
+    header: 'Юрий',
   },
   {
     senderId:4,chatId: 1, type: "message.text", text: "Привет! Давай сейчас",
     status: 'read', timestamp: '1727028959',
     actions: [
       { action: 'edit', title: 'изменить', icon: 'https://placehold.jp/30/336633/ffffff/64x64.png?text=pin' },
-      { action: 'delete', title: 'удалить' }]
+      { action: 'delete', title: 'удалить' }
+    ],
+    header: 'Татьяна',
   },
   {
     chatId: 1, senderId:4, type: "message.video", url: "https://filebump2.services.mobilon.ru/file/i3UQnryC89WwxtigxSUXWq0ltJBhLfJXp5hT",
     direction: 'outgoing', status: 'read', timestamp: '1727087959',views: 1667,alt: "Example Video",
+    header: 'Татьяна',
   },
   {
     chatId: 1, messageId: 1,
@@ -54,8 +60,9 @@ export const messages = [
   {
     senderId:2,chatId: 2, text:'Привет! Можешь распечатать?',type: "message.file", url: "https://axiomabio.com/pdf/test.pdf", filename: "Документ.pdf",
     status: 'read', timestamp: '1727026959', actions: [{ action: 'edit', title: 'изменить' }, { action: 'delete', title: 'удалить' }]
+    ,header: 'Василий',
   },
-  { senderId:2,chatId: 2, type: "message.text", text: "Очень нужно!", status: 'read', timestamp: '1727027969' },
+  { senderId:2,chatId: 2, type: "message.text", text: "Очень нужно!", status: 'read', timestamp: '1727027969',header: 'Василий', },
   {
     senderId:4,chatId: 2, type: "message.audio", url: "https://file-examples.com/storage/fe40e015d566f1504935cfd/2017/11/file_example_MP3_700KB.mp3",
     status: 'received', timestamp: '1727527159',
@@ -63,6 +70,7 @@ export const messages = [
     transcript: {
       text: 'Хорошо, заходи через полчаса',
     },
+    header: 'Татьяна',
   },
 /**Chat 3 */
   {
@@ -71,11 +79,13 @@ export const messages = [
     transcript: {
       text: 'Очень плохо себя чувствую, не смогу, к сожалению...',
     },
+    header: 'Алексей',
   },
   {
     senderId:4,chatId: 3, type: "message.image", url: "https://nationaltoday.com/wp-content/uploads/2022/05/Sun-Day--1200x834.jpg", alt: "Example Image",
     timestamp: '1726743559', text: "Посмотри, как красиво я умею фотографировать", status: 'read',
+    header: 'Татьяна',
   },
-  { senderId:4,chatId: 3, type: "message.text", text: "Привет! Ждём сегодня в обед на мероприятие, сможешь прийти?", status: 'read', timestamp: '1727027059' },
+  { header: 'Татьяна', senderId:4,chatId: 3, type: "message.text", text: "Привет! Ждём сегодня в обед на мероприятие, сможешь прийти?", status: 'read', timestamp: '1727027059' },
 
 ];

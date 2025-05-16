@@ -20,40 +20,4 @@ export const chats = [
     typing: false,
     metadata: 'юрий',    // фильтр работает по name и данным в metadata
   },
-  {
-    chatId: 2, name: "Василий",
-    countUnread: 0, countUnreadOut: 1,
-    isFixedBottom: false,
-    isFixedTop: false,
-    'lastActivity.time': '28.09.2024',
-    'lastActivity.timestamp': '1727527159',
-    'lastMessage.status': 'received', // received|read|sent|in
-    actions: [
-      { action: 'pinUp', title: 'прикрепить сверху' },
-      { action: 'pinDown', title: 'прикрепить снизу' }
-    ],
-    typing: false,
-    typingIn: false,
-    lastMessage: '🔊 Голосовое сообщение',
-    metadata: 'василий',
-    status: 'lightgreen',
-  },
-  {
-    chatId: 3, name: "Алексей",
-    countUnread: 1, countUnreadOut: 0,
-    isFixedBottom: false,
-    isFixedTop: false,
-    'lastActivity.time': '23.09.2024',
-    'lastMessage.status': 'in', // received|read|sent|in
-    'lastActivity.timestamp': '1727027959',
-    actions: [
-      { action: 'pinUp', title: 'прикрепить сверху' },
-      { action: 'pinDown', title: 'прикрепить снизу' }
-    ],
-    typing: false,
-    typingIn: false,
-    lastMessage: 'Привет! ...',
-    metadata: 'алексей',
-    status: 'lightgreen',
-  },
 ];

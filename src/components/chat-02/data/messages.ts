@@ -12,11 +12,13 @@ export const messages = [
     transcript: {
       text: 'Очень плохо себя чувствую, не смогу, к сожалению...',
     },
+    header: 'Алексей',
   },
   {
     senderId:3,chatId: 2, type: "message.image", url: "https://nationaltoday.com/wp-content/uploads/2022/05/Sun-Day--1200x834.jpg", alt: "Example Image",
     timestamp: '1726743559', text: "Посмотри, как красиво я умею фотографировать", status: 'read',
+    header: 'Татьяна',
   },
-  { senderId:3,chatId: 2, type: "message.text", text: "Привет! Ждём сегодня в обед на мероприятие, сможешь прийти?", status: 'read', timestamp: '1727027059' },
+  { header: 'Татьяна',senderId:3,chatId: 2, type: "message.text", text: "Привет! Ждём сегодня в обед на мероприятие, сможешь прийти?", status: 'read', timestamp: '1727027059' },
 
 ];

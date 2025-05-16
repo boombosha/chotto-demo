@@ -3,13 +3,13 @@ export const chats = [
     chatId: 1, name: "Юрий",
     avatar: 'https://img.freepik.com/free-photo/smiley-man-relaxing-outdoors_23-2148739334.jpg',
     countUnread: 0, countUnreadOut: 0,
-    lastMessage: 'Начать диалог',
+    lastMessage: 'Посмотри это видео, пожалуйста',
     'lastActivity.time': '23.09.2024',         // читаемый формат - для пользователей
     'lastActivity.timestamp': '1727087959',   // для сортировки
     isFixedBottom: false,
     isFixedTop: false,
     status: 'lightgreen',
-    'lastMessage.status': 'in', // received|read|sent|in
+    'lastMessage.status': 'read', // received|read|sent|in
     actions: [
       { action: 'pinUp', title: 'прикрепить сверху' },
       { action: 'pinDown', title: 'прикрепить снизу' }
@@ -34,7 +34,7 @@ export const chats = [
     ],
     typing: false,
     typingIn: false,
-    lastMessage: 'Привет! ...',
+    lastMessage: 'Аудиосообщение',
     metadata: 'алексей',
     status: 'lightgreen',
   },

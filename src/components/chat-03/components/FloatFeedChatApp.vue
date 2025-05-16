@@ -55,6 +55,7 @@
                 :scroll-to-bottom="isScrollToBottomOnUpdateObjectsEnabled"
                 :typing="selectedChat.typingIn"
                 :scroll-to="clickedMessage"
+                :enable-double-click-reply="true"
                 @message-action="messageAction"
                 @load-more="loadMore"
                 @message-visible="messageVisible"
@@ -289,6 +290,8 @@ const addMessage = (message) => {
   props.dataProvider.addMessage({
     text: message.text,
     type: message.type,
+    reply: message.reply,
+    header: userProfile.value.name,
     chatId: selectedChat.value.chatId,
     senderId: props.index + 1,
     timestamp: Date.now()/ 1000,
