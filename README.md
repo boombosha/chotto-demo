@@ -12,6 +12,7 @@ Chat samples based on [mobilon-dev/chotto](https://github.com/mobilon-dev/chotto
 - Chat05 - chat multidialog system. Several dialogs with one contact. 
 - Chat06 - audio and video recording. Recording, listenning and sending audio and video messages.
 - Chat07 - GigaChat conversation. GigaChat - Sber's AI LLM (Large Language Model). [Here](https://giga.chat/) you can learn more about it and [here](https://mobilon-dev.github.io/gigachat-api-explorer/) you can try GigaChat API in work.
+- Chat08 - re-styling by user`s conditions. Several components can be restyled by user's classes.
 
 # Link
 

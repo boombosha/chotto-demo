@@ -1,0 +1,383 @@
+<template>
+  <div>
+    <button v-if="!userProfile.online" @mousedown="onlineUser">
+      Открыть чат
+    </button>
+    <FloatContainer
+      v-else
+      :title="userProfile ? userProfile.name : ''"
+      color-title="#d4d4d4"
+      :avatar="userProfile ? userProfile.avatar : ''"
+      height="700px"
+      width="900px"
+      @close-window="offlineUser"
+    >
+      <BaseLayout>
+
+        <template #first-col>
+          <UserProfile :user="userProfile" />
+          <ChatList
+            :chats="chatsStore.chats"
+            filter-enabled
+            @select="selectChat"
+            @action="chatAction"
+          />
+          <ThemeMode
+            :themes="themes"
+            @selected-theme="setTheme"
+          />
+        </template>
+
+        <template #second-col>
+          <chat-wrapper
+            :is-open-chat-panel="isOpenChatPanel"
+            :is-selected-chat="!!selectedChat"
+            :apply-style="setChatWrapperStyle"
+          >
+            <template #default>
+              <ChatInfo
+                :chat="selectedChat"
+               >
+               <template #actions>
+                  <div style="display: flex;">
+                    <button
+                      class="chat-info__button-panel"
+                      @click="isOpenChatPanel = !isOpenChatPanel"
+                    >
+                      <span class="pi pi-info-circle" />
+                    </button>
+                  </div>
+                </template>
+              </ChatInfo> 
+              
+              <Feed
+                :button-params="selectedChat.countUnread > 0 ? {unreadAmount: selectedChat.countUnread} : null"
+                :objects="messages"
+                :scroll-to-bottom="isScrollToBottomOnUpdateObjectsEnabled"
+                :typing="selectedChat.typing"
+                :enable-double-click-reply="true"
+                :apply-style="setMessageStyle"
+                @message-action="messageAction"
+                @load-more="loadMore"
+                @message-visible="messageVisible"
+                />
+              <ChatInput
+                @send="addMessage"
+                @typing="sendTyping"
+                :state="chatInputState"
+                disabled-placeholder="Отправка не доступна. Выберите определенный диалог."
+              >
+                <template #inline-buttons>
+                  <FileUploader
+                    :filebump-url="filebumpUrl"
+                    :state="chatInputState"
+                  />
+                  <ButtonEmojiPicker 
+                    :mode="'hover'"
+                    :state="chatInputState"
+                  />
+                  <ButtonTemplateSelector
+                    :templates="templates.templates"
+                    :mode="'click'"
+                    :state="chatInputState"
+                  />
+                  
+                </template>
+              </ChatInput>
+            </template>
+
+            <template #chatpanel>
+              <ChatPanel
+                v-if="isOpenChatPanel"
+                :title="selectedChat.name"
+                @close-panel="isOpenChatPanel = !isOpenChatPanel"
+              >
+                <template #content>
+                  Информация
+                </template>
+              </ChatPanel>
+            </template>
+          </chat-wrapper>
+        </template>
+      </BaseLayout>
+    </FloatContainer>
+  </div>
+</template>
+
+<script setup>
+import { onMounted, ref, watch, nextTick, computed } from "vue";
+
+import {
+  ChatInfo,
+  ChatInput,
+  ChatList,
+  Feed,
+  UserProfile,
+  ChatPanel,
+  FloatContainer,
+  ChatWrapper,
+  formatTimestamp,
+  insertDaySeparators,
+  playNotificationAudio,
+  sortByTimestamp,
+  BaseLayout,
+  FileUploader,
+  ButtonEmojiPicker,
+  ButtonTemplateSelector,
+  ThemeMode,
+  useModalCreateDialog,
+  AudioRecorder,
+} from "@mobilon-dev/chotto";
+
+import { useChatsStore } from "../../../stores/chatsStore";
+import { transformToFeed } from "../../../transform/transformToFeed";
+import { useNewMessage } from "../useNewMessage";
+
+const {newMessage} = useNewMessage()
+
+watch(
+  () => newMessage.value,
+  () => {
+    messages.value = getFeedObjects();
+  },
+)
+
+// Define props
+const props = defineProps({
+  authProvider: {
+    type: Object,
+    required: true,
+  },
+  dataProvider: {
+    type: Object,
+    required: true,
+  },
+  index: {
+    type: Number,
+    required: true
+  }
+});
+
+const themes = [
+  {
+    code: "light",
+    name: "Light",
+  },
+  {
+    code: "dark",
+    name: "Dark",
+  },
+  {
+    code: "green",
+    name: "Green",
+  },
+  {
+    code: "custom",
+    name: "custom",
+  },
+];
+const chatsStore = useChatsStore();
+
+// Reactive data
+const channels = ref([]);
+const selectedChat = ref(null);
+const selectedDialog = ref(null)
+const messages = ref([]);
+const userProfile = ref({});
+const templates = ref([]);
+const isOpenChatPanel = ref(false);
+const isScrollToBottomOnUpdateObjectsEnabled = ref(false);
+const filebumpUrl = ref('https://filebump2.services.mobilon.ru');
+
+const theme = ref('')
+const setTheme = (themeCode) => {
+  theme.value = themeCode
+}
+
+const setChatWrapperStyle = () => {
+  if (selectedDialog.value){
+    if (selectedDialog.value.dialogId == '1') return 'wrapper wa-wrapper'
+    if (selectedDialog.value.dialogId == '2') return 'wrapper tg-wrapper'
+  }
+  return 'wrapper'
+}
+
+const setMessageStyle = (message) => {
+  if (message){
+    if (message.dialogId == '1') return 'wa-message'
+    if (message.dialogId == '2') return 'tg-message'
+  }
+  return null
+}
+
+const chatInputState = computed(() => {
+  if (selectedDialog.value && selectedDialog.value.dialogId == 'all')
+    return 'disabled'
+  else return 'active'
+})
+
+const offlineUser = () => {
+  userProfile.value.online = false
+  userProfile.value.status = 'gray'
+  props.authProvider.setUserProfileOnline(props.index, false);
+  chatsStore.setStatus(selectedChat.value.chatId, 'gray')
+}
+
+const onlineUser = () => {
+  userProfile.value.online = true
+  userProfile.value.status = 'lightgreen'
+  props.authProvider.setUserProfileOnline(props.index, true);
+  chatsStore.setStatus(selectedChat.value.chatId, 'lightgreen')
+}
+
+const chatAction = async (data) => {
+  console.log("chat action", data);
+  if (data.action === 'addDialog'){
+    const data1 = await useModalCreateDialog('Новый диалог', data.chat.name, data.chat.contact.attributes, channels.value, null, theme.value)
+    console.log('info', data1);
+    props.dataProvider.addDialog(data1.contact.value, data1.channel.title, data.chat.chatId)
+  }
+};
+
+
+const messageAction = (data) => {
+  console.log("message action", data);
+};
+
+const messageVisible = (message) => {
+  if (message.chatId && message.chatId == selectedChat.value.chatId){
+    if (message.senderId != props.index + 1 && message.status == 'received' && message.position == 'left'){
+      chatsStore.readCurrentMessage(selectedChat.value.chatId, message)
+      chatsStore.decreaseUnreadCounter(selectedChat.value.chatId, 1)
+      chatsStore.decreaseDialogUnreadCounter(selectedChat.value.chatId, selectedDialog.value.dialogId, 1)
+      newMessage.value = !newMessage.value
+    }
+  }
+}
+
+const loadMore = () => {
+  // do load more messages to feed
+  console.log("load more");
+};
+
+const getFeedObjects = () => {
+  if (selectedChat.value && selectedDialog.value) {
+    // здесь обработка для передачи сообщений в feed
+    isScrollToBottomOnUpdateObjectsEnabled.value = true;
+    const messages1 = props.dataProvider.getFeed(selectedChat.value.chatId, selectedDialog.value.dialogId);
+    const messages3 = transformToFeed(messages1, props.index);
+    if (JSON.stringify(messages.value) != JSON.stringify(messages3))
+      nextTick(() => {
+        newMessage.value = !newMessage.value
+      })
+    return messages3;
+  } else {
+    return [];
+  }
+};
+
+const addMessage = (message) => {
+  console.log(message);
+  // Добавление сообщения в хранилище
+  props.dataProvider.addMessage({
+    text: message.text,
+    type: message.type,
+    reply: message.reply,
+    header: userProfile.value.name,
+    chatId: selectedChat.value.chatId,
+    dialogId: selectedDialog.value.dialogId,
+    senderId: props.index + 1,
+    timestamp: Date.now() / 1000,
+    status: 'received',
+    url: message.url,
+    filename: message.filename,
+  });
+  newMessage.value = !newMessage.value
+  messages.value = getFeedObjects(); // Обновление сообщений
+  const chatMessageText = message.text == '' ? '↺ ' + message.filename : message.text
+  chatsStore.updateChatNewMessage(
+    selectedChat.value.chatId, 
+    0, 
+    chatMessageText, 
+    formatTimestamp(Date.now()/ 1000),
+    Date.now()/ 1000,
+    'received',
+  )
+  //chatsStore.increaseUnreadCounterOut(selectedChat.value.chatId, 1)
+};
+
+let timer;
+const sendTyping = () => {
+  chatsStore.setTypingIn(selectedChat.value.chatId, true)
+  clearTimeout(timer)
+  timer = setTimeout(() => {
+    chatsStore.setTypingIn(selectedChat.value.chatId, false)
+  },5000)
+}
+
+const selectChat = async (args) => {
+  if (args.chat && args.dialog && args.dialog.dialogId == 'new'){
+    const data1 = await useModalCreateDialog('Новый диалог', args.chat.name, args.chat.contact.attributes, channels.value, null, theme.value)
+    console.log('info', data1);
+    props.dataProvider.addDialog(data1.contact.value, data1.channel.title, args.chat.chatId)
+  }
+  else {
+    selectedChat.value = args.chat;
+    selectedDialog.value = args.dialog;
+    if (args.chat && args.dialog && args.dialog.dialogId == 'all'){
+      messages.value = getFeedObjects();
+    }
+    else {
+      
+      if (selectedChat.value.countUnread > 0 || selectedDialog.value.countUnread > 0){
+        chatsStore.decreaseUnreadCounter(args.chat.chatId, args.dialog.countUnread);
+        chatsStore.setDialogUnreadCounter(args.chat.chatId,args.dialog.dialogId, 0)
+        //chatsStore.readMessages(args.chat.chatId, props.index + 1)
+      }
+      messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
+    }
+  }
+  
+};
+
+onMounted(() => {
+  channels.value = props.dataProvider.getChannels();
+  userProfile.value = props.authProvider.getUserProfile(props.index);
+  chatsStore.chats = props.dataProvider.getChats();
+  templates.value = props.dataProvider.getTemplates()
+});
+</script>
+
+<style>
+
+.tg-wrapper{
+  --chotto-message-right-bg: #DAF0FF;
+  --chotto-message-right-secondary-bg: #bce1fa;
+  --chotto-message-accent-line-color: #37AFE2;
+  --chotto-chat-input-icon-color: #37AFE2;
+}
+
+.wa-wrapper{
+  --chotto-message-right-bg: #D9FDD3;
+  --chotto-message-right-secondary-bg: #bbf3b2;
+  --chotto-message-accent-line-color: #25D366;
+  --chotto-chat-input-icon-color: #25D366;
+}
+
+.wrapper{
+  --chotto-chat-input-button-padding: 5px;
+}
+
+.tg-message{
+  --chotto-message-right-bg: #DAF0FF;
+  --chotto-message-right-secondary-bg: #bce1fa;
+  --chotto-message-accent-line-color: #37AFE2;
+}
+
+.wa-message{
+  --chotto-message-right-bg: #D9FDD3;
+  --chotto-message-right-secondary-bg: #bbf3b2;
+  --chotto-message-accent-line-color: #25D366;
+}
+
+</style>

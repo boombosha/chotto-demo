@@ -8,6 +8,7 @@ import ChatDemo4 from './components/chat-04/ChatDemo4.vue';
 import ChatDemo5 from './components/chat-05/ChatDemo5.vue';
 import ChatDemo6 from './components/chat-06/ChatDemo6.vue';
 import ChatDemo7 from './components/chat-07/ChatDemo7.vue';
+import ChatDemo8 from './components/chat-08/ChatDemo8.vue';
 import { ButtonContextMenu } from '@mobilon-dev/chotto';
 
 const chats = [
@@ -51,13 +52,27 @@ const chats = [
     title: 'Chat07',
     name: 'Chat07 - GigaChat conversation',
   },
+  {
+    index: 8,
+    title: 'Chat08',
+    name: 'Chat08 - re-styling by user`s conditions',
+  },
 ]
 
-
-const currentChat = ref(chats[7].index)
-const currentName = ref(chats[7].name)
+const currentChat = ref(chats[8].index)
+const currentName = ref(chats[8].name)
 const componentsMap = (index) => {
-  const r = [ChatDemo0, ChatDemo1, ChatDemo2, ChatDemo3, ChatDemo4, ChatDemo5, ChatDemo6, ChatDemo7]
+  const r = [
+    ChatDemo0,
+    ChatDemo1, 
+    ChatDemo2, 
+    ChatDemo3, 
+    ChatDemo4, 
+    ChatDemo5, 
+    ChatDemo6,
+    ChatDemo7, 
+    ChatDemo8
+  ]
   return r[index];
 }
 
@@ -80,9 +95,6 @@ const handleClick = (action) => {
     >
       <span class="pi pi-list"></span>
     </ButtonContextMenu>
-    <Teleport to="body">
-      <div class="context-menu" data-theme="light" id="float-windows-undefined"></div>
-    </Teleport>
     
     <h2 class="toolbar-title">
       {{ currentName }}
