@@ -9,6 +9,7 @@ import ChatDemo5 from './components/chat-05/ChatDemo5.vue';
 import ChatDemo6 from './components/chat-06/ChatDemo6.vue';
 import ChatDemo7 from './components/chat-07/ChatDemo7.vue';
 import ChatDemo8 from './components/chat-08/ChatDemo8.vue';
+import ChatDemo9 from './components/chat-09/ChatDemo9.vue';
 import { ButtonContextMenu } from '@mobilon-dev/chotto';
 
 const chats = [
@@ -57,10 +58,15 @@ const chats = [
     title: 'Chat08',
     name: 'Chat08 - re-styling by user`s conditions',
   },
+  {
+    index: 9,
+    title: 'Chat09',
+    name: 'Chat09 - custom placeholders',
+  },
 ]
 
-const currentChat = ref(chats[8].index)
-const currentName = ref(chats[8].name)
+const currentChat = ref(chats[9].index)
+const currentName = ref(chats[9].name)
 const componentsMap = (index) => {
   const r = [
     ChatDemo0,
@@ -71,7 +77,8 @@ const componentsMap = (index) => {
     ChatDemo5, 
     ChatDemo6,
     ChatDemo7, 
-    ChatDemo8
+    ChatDemo8,
+    ChatDemo9,
   ]
   return r[index];
 }
