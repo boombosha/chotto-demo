@@ -357,6 +357,7 @@ const selectActualChatDialog = () => {
     if (chat.dialogs && chat.dialogs.length > 0){
       for (let dialog of chat.dialogs){
         if (dialog.defaultSelected){
+          chat.isSelected = true
           dialog.isSelected = true
           chat.dialogsExpanded = true
           selectChat({chat: chat, dialog: dialog})
