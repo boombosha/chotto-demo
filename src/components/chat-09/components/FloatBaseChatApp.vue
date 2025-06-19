@@ -319,19 +319,29 @@ const sendTyping = () => {
 }
 
 const selectChat = async (args) => {
-  console.log(args)
-    selectedChat.value = args.chat;
-    selectedDialog.value = args.dialog;
-    if (selectedChat.value.countUnread > 0 || selectedDialog.value.countUnread > 0){
-      chatsStore.decreaseUnreadCounter(args.chat.chatId, args.dialog.countUnread);
-      chatsStore.setDialogUnreadCounter(args.chat.chatId,args.dialog.dialogId, 0)
-      //chatsStore.readMessages(args.chat.chatId, props.index + 1)
+ for (let chat of chatsStore.chats){
+    if (args.chat != chat){
+      chat.dialogsExpanded = false
+      chat.isSelected = false
     }
-    messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
+    if (chat.dialogs && chat.dialogs.length > 0){
+      for (let dialog of chat.dialogs){
+        if (args.dialog != dialog)
+          dialog.isSelected = false
+      }
+    }
+  }
+  selectedChat.value = args.chat;
+  selectedDialog.value = args.dialog;
+  if (selectedChat.value.countUnread > 0 || selectedDialog.value.countUnread > 0){
+    chatsStore.decreaseUnreadCounter(args.chat.chatId, args.dialog.countUnread);
+    chatsStore.setDialogUnreadCounter(args.chat.chatId,args.dialog.dialogId, 0)
+    //chatsStore.readMessages(args.chat.chatId, props.index + 1)
+  }
+  messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
 };
 
 const selectActualChatDialog = () => {
-  console.log(chatsStore.chats)
   const chats = chatsStore.chats
     .toSorted((a, b) => {
       if (Number(a['lastActivity.timestamp']) > Number(b['lastActivity.timestamp'])) return -1;
@@ -343,7 +353,6 @@ const selectActualChatDialog = () => {
       if (a.countUnread < b.countUnread) return 1;
       if (a.countUnread == b.countUnread) return 0;
     })
-  console.log(chats)
   for (let chat of chats){
     if (chat.dialogs && chat.dialogs.length > 0){
       for (let dialog of chat.dialogs){
