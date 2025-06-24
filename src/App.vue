@@ -53,7 +53,7 @@ const currentName = ref(chats[9].title)
 
 
 const handleClick = (action) => {
-  router.push('/chotto-demo/' + action.index)
+  router.push('/' + action.index)
 }
 </script>
 
