@@ -6,7 +6,9 @@ import {
   userProfiles, templates
 } from './data';
 import { useChatsStore } from '../../stores/chatsStore';
+import { useIndexedTitle } from '../../useIndexedTitle';
 
+const {set} = useIndexedTitle()
 const chatsStore = useChatsStore()
 // Mock data
 const data3 = {
@@ -56,6 +58,7 @@ const dataProvider = {
 
 onMounted(() => {
   chatsStore.messages = dataProvider.getMessages();
+  set(6)
 })
 </script>
 

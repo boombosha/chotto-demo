@@ -7,7 +7,9 @@ import {
   sidebarItems
 } from './data';
 import { useChatsStore } from '../../stores/chatsStore';
+import { useIndexedTitle } from '../../useIndexedTitle';
 
+const {set} = useIndexedTitle()
 const chatsStore = useChatsStore()
 const width = ref(1300)
 
@@ -87,6 +89,7 @@ const dataProvider = {
 
 onMounted(() => {
   chatsStore.messages = dataProvider.getMessages();
+  set(4)
 })
 </script>
 
