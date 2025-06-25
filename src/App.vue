@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue';
 import { ButtonContextMenu } from '@mobilon-dev/chotto';
 import router from './router';
 import { useIndexedTitle } from './useIndexedTitle';
@@ -47,10 +46,6 @@ const chats = [
     title: 'Chat09 - custom placeholders',
   },
 ]
-
-const currentChat = ref(chats[9].index)
-const currentName = ref(chats[9].title)
-
 
 const handleClick = (action) => {
   router.push('/' + action.index)

@@ -20,6 +20,7 @@
             :chats="chatsStore.chats"
             filter-enabled
             @select="selectChat"
+            @expand="expandChat"
             @action="chatAction"
           />
           <ThemeMode
@@ -78,6 +79,10 @@
                   
                 </template>
               </ChatInput>
+            </template>
+
+            <template #placeholder>
+              Выберите диалог из списка слева
             </template>
 
             <template #chatpanel>
@@ -294,6 +299,11 @@ const selectChat = async (args) => {
     console.log('info', data1);
     props.dataProvider.addDialog(data1.contact.value, data1.channel.title, args.chat.chatId)
   }
+  if (!args.dialog){
+    chatsStore.chats[0].isSelected = false
+    selectedDialog.value = null
+    selectedChat.value = null
+  }
   else {
     selectedChat.value = args.chat;
     selectedDialog.value = args.dialog;
@@ -305,6 +315,14 @@ const selectChat = async (args) => {
     messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
   }
 };
+
+const expandChat = (args) => {
+  console.log(args)
+  for (let chat of chatsStore.chats){
+    if (chat.chatId != args.chatId) chat.dialogsExpanded = false
+    else chat.dialogsExpanded = !chat.dialogsExpanded
+  }
+}
 
 onMounted(() => {
   channels.value = props.dataProvider.getChannels();

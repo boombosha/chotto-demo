@@ -20,6 +20,7 @@
             :chats="chatsStore.chats"
             filter-enabled
             @select="selectChat"
+            @expand="expandChat"
             @action="chatAction"
           />
           <ThemeMode
@@ -319,27 +320,47 @@ const sendTyping = () => {
 }
 
 const selectChat = async (args) => {
- for (let chat of chatsStore.chats){
-    if (args.chat != chat){
-      chat.dialogsExpanded = false
-      chat.isSelected = false
+  if (args.dialog){
+    for (let chat of chatsStore.chats){
+
+      if (args.chat != chat){
+        chat.dialogsExpanded = false
+        chat.isSelected = false
+      }
+      if (chat.dialogs && chat.dialogs.length > 0){
+        for (let dialog of chat.dialogs){
+          if (args.dialog != dialog)
+            dialog.isSelected = false
+        }
+      }
     }
-    if (chat.dialogs && chat.dialogs.length > 0){
-      for (let dialog of chat.dialogs){
-        if (args.dialog != dialog)
-          dialog.isSelected = false
+    selectedChat.value = args.chat;
+    selectedDialog.value = args.dialog;
+    if (selectedChat.value.countUnread > 0 || selectedDialog.value.countUnread > 0){
+      chatsStore.decreaseUnreadCounter(args.chat.chatId, args.dialog.countUnread);
+      chatsStore.setDialogUnreadCounter(args.chat.chatId,args.dialog.dialogId, 0)
+      //chatsStore.readMessages(args.chat.chatId, props.index + 1)
+    }
+    messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
+  }
+  else {
+    for (let chat of chatsStore.chats){
+      if (chat == args.chat) {
+        chat.isSelected = false
+        selectedDialog.value = null
+        selectedChat.value = null
       }
     }
   }
-  selectedChat.value = args.chat;
-  selectedDialog.value = args.dialog;
-  if (selectedChat.value.countUnread > 0 || selectedDialog.value.countUnread > 0){
-    chatsStore.decreaseUnreadCounter(args.chat.chatId, args.dialog.countUnread);
-    chatsStore.setDialogUnreadCounter(args.chat.chatId,args.dialog.dialogId, 0)
-    //chatsStore.readMessages(args.chat.chatId, props.index + 1)
-  }
-  messages.value = getFeedObjects(); // Обновляем сообщения при выборе контакта
 };
+
+const expandChat = (args) => {
+  console.log(args)
+  for (let chat of chatsStore.chats){
+    if (chat.chatId != args.chatId) chat.dialogsExpanded = false
+    else chat.dialogsExpanded = !chat.dialogsExpanded
+  }
+}
 
 const selectActualChatDialog = () => {
   const chats = chatsStore.chats

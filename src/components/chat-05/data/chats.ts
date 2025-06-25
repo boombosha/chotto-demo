@@ -30,7 +30,7 @@ export const chats = [
         fullname: 'диалог1 номер 79135292926 канал whatsapp 73912000000 (основной)',   // для tooltip'а
         countUnread: 10,
         'lastActivity.timestamp': 1727001759456,   // для сортировки
-        isSelected: true,
+        isSelected: false,
       },
       {
         dialogId: '2',
