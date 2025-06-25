@@ -17,16 +17,16 @@ Chat samples based on [mobilon-dev/chotto](https://github.com/mobilon-dev/chotto
 
 # Link
 
-[Try it now - Chat 00](https://mobilon-dev.github.io/chotto-demo/#/0)
-[Try it now - Chat 01](https://mobilon-dev.github.io/chotto-demo/#/1)
-[Try it now - Chat 02](https://mobilon-dev.github.io/chotto-demo/#/2)
-[Try it now - Chat 03](https://mobilon-dev.github.io/chotto-demo/#/3)
-[Try it now - Chat 04](https://mobilon-dev.github.io/chotto-demo/#/4)
-[Try it now - Chat 05](https://mobilon-dev.github.io/chotto-demo/#/5)
-[Try it now - Chat 06](https://mobilon-dev.github.io/chotto-demo/#/6)
-[Try it now - Chat 07](https://mobilon-dev.github.io/chotto-demo/#/7)
-[Try it now - Chat 08](https://mobilon-dev.github.io/chotto-demo/#/8)
-[Try it now - Chat 09](https://mobilon-dev.github.io/chotto-demo/#/9)
+- [Try it now - Chat 00](https://mobilon-dev.github.io/chotto-demo/#/0)
+- [Try it now - Chat 01](https://mobilon-dev.github.io/chotto-demo/#/1)
+- [Try it now - Chat 02](https://mobilon-dev.github.io/chotto-demo/#/2)
+- [Try it now - Chat 03](https://mobilon-dev.github.io/chotto-demo/#/3)
+- [Try it now - Chat 04](https://mobilon-dev.github.io/chotto-demo/#/4)
+- [Try it now - Chat 05](https://mobilon-dev.github.io/chotto-demo/#/5)
+- [Try it now - Chat 06](https://mobilon-dev.github.io/chotto-demo/#/6)
+- [Try it now - Chat 07](https://mobilon-dev.github.io/chotto-demo/#/7)
+- [Try it now - Chat 08](https://mobilon-dev.github.io/chotto-demo/#/8)
+- [Try it now - Chat 09](https://mobilon-dev.github.io/chotto-demo/#/9)
 
 # Screenshot
 
