@@ -9,8 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/open-sans": "^5.2.7",
     "@microsoft/fetch-event-source": "^2.0.1",
-    "@mobilon-dev/chotto": "^0.0.134",
+    "@mobilon-dev/chotto": "^0.3.4",
     "axios": "^1.7.9",
     "pinia": "^2.2.8",
     "primeicons": "^7.0.0",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
+    "sass-embedded": "^1.93.2",
     "vite": "^6.0.5"
   }
 }
