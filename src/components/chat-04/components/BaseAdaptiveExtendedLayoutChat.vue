@@ -161,7 +161,7 @@
                   />
                 </template>
               </ChatInput>
-              </div>
+            </div>
               
             </template>
 
@@ -252,8 +252,8 @@ const themes = [
     name: "Green",
   },
   {
-    code: "custom",
-    name: "custom",
+    code: "mobilon1",
+    name: "mobilon1",
   },
 ];
 
@@ -492,7 +492,7 @@ onMounted(() => {
 });
 </script>
 
-<style>
+<style scoped>
 .chat-list-title-container{
   display: flex;
   justify-content: space-between;
@@ -506,5 +506,9 @@ onMounted(() => {
 
 .bcm-chat-action{
   line-height: 27px;
+}
+
+:deep(.chat-input__third-line) {
+  --chotto-chatinput-third-line-grid-column-start: 1;
 }
 </style>

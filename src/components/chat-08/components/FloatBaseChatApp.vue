@@ -24,6 +24,7 @@
             @action="chatAction"
           />
           <ThemeMode
+            :show="true"
             :themes="themes"
             @selected-theme="setTheme"
           />
@@ -175,8 +176,8 @@ const themes = [
     name: "Green",
   },
   {
-    code: "custom",
-    name: "custom",
+    code: "mobilon1",
+    name: "mobilon1",
   },
 ];
 const chatsStore = useChatsStore();

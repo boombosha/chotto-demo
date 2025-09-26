@@ -20,7 +20,7 @@
             <template #default>
               <ThemeMode
                 :themes="themes"
-                :show="false"
+                :show="true"
               />
               <Feed
                 :button-params="selectedChat.countUnreadOut > 0 ? {unreadAmount: selectedChat.countUnreadOut} : null"
@@ -109,8 +109,8 @@ const themes = [
     name: "Green",
   },
   {
-    code: "custom",
-    name: "custom",
+    code: "mobilon1",
+    name: "mobilon1",
   },
 ];
 const chatsStore = useChatsStore();

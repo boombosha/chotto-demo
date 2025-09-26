@@ -32,7 +32,7 @@
             <template #default>
               <ThemeMode
                 :themes="themes"
-                :show="false"
+                :show="true"
               />
               <FeedSearch 
                 v-if="isOpenSearchPanel"
@@ -148,8 +148,8 @@ const themes = [
     name: "Green",
   },
   {
-    code: "custom",
-    name: "custom",
+    code: "mobilon1",
+    name: "mobilon1",
   },
 ];
 const chatsStore = useChatsStore();
